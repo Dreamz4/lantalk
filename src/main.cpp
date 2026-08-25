@@ -324,15 +324,15 @@ void applyLoggingFlags(const lantalk::ParsedArgs& args) {
         Logger::instance().setQuiet(true);
     }
     if (args.hasFlag("verbose")) {
-        Logger::instance().setLevel(LogLevel::DEBUG);
+        Logger::instance().setLevel(LogLevel::LevelDebug);
     }
     if (auto lvl = args.getFlag("log-level")) {
         const std::string& s = *lvl;
-        if      (s == "trace") Logger::instance().setLevel(LogLevel::TRACE);
-        else if (s == "debug") Logger::instance().setLevel(LogLevel::DEBUG);
-        else if (s == "info")  Logger::instance().setLevel(LogLevel::INFO);
-        else if (s == "warn")  Logger::instance().setLevel(LogLevel::WARN);
-        else if (s == "error") Logger::instance().setLevel(LogLevel::ERROR);
+        if      (s == "trace") Logger::instance().setLevel(LogLevel::LevelTrace);
+        else if (s == "debug") Logger::instance().setLevel(LogLevel::LevelDebug);
+        else if (s == "info")  Logger::instance().setLevel(LogLevel::LevelInfo);
+        else if (s == "warn")  Logger::instance().setLevel(LogLevel::LevelWarn);
+        else if (s == "error") Logger::instance().setLevel(LogLevel::LevelError);
         else {
             std::cerr << "Unknown log level: " << s
                       << ". Valid: trace debug info warn error\n";

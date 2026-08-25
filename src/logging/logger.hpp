@@ -11,12 +11,12 @@
 namespace lantalk {
 
 enum class LogLevel : int {
-    TRACE = 0,
-    DEBUG = 1,
-    INFO  = 2,
-    WARN  = 3,
-    ERROR = 4,
-    OFF   = 5
+    LevelTrace = 0,
+    LevelDebug = 1,
+    LevelInfo  = 2,
+    LevelWarn  = 3,
+    LevelError = 4,
+    LevelOff   = 5
 };
 
 class Logger {
@@ -45,7 +45,7 @@ private:
     Logger& operator=(const Logger&) = delete;
 
     mutable std::mutex mutex_;
-    std::atomic<LogLevel> level_{LogLevel::INFO};
+    std::atomic<LogLevel> level_{LogLevel::LevelInfo};
     std::atomic<bool> quiet_{false};
     std::optional<std::ofstream> fileStream_;
 

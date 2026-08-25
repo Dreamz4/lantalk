@@ -49,10 +49,10 @@ void Logger::log(LogLevel level, std::string_view message, const std::source_loc
         std::string colorPrefix = "";
         std::string colorSuffix = "";
         #ifndef _WIN32
-        if (level == LogLevel::ERROR) {
+        if (level == LogLevel::LevelError) {
             colorPrefix = "\033[31m"; // Red
             colorSuffix = "\033[0m";
-        } else if (level == LogLevel::WARN) {
+        } else if (level == LogLevel::LevelWarn) {
             colorPrefix = "\033[33m"; // Yellow
             colorSuffix = "\033[0m";
         }
@@ -66,19 +66,19 @@ void Logger::log(LogLevel level, std::string_view message, const std::source_loc
 }
 
 void Logger::trace(std::string_view msg, const std::source_location& loc) {
-    log(LogLevel::TRACE, msg, loc);
+    log(LogLevel::LevelTrace, msg, loc);
 }
 void Logger::debug(std::string_view msg, const std::source_location& loc) {
-    log(LogLevel::DEBUG, msg, loc);
+    log(LogLevel::LevelDebug, msg, loc);
 }
 void Logger::info(std::string_view msg, const std::source_location& loc) {
-    log(LogLevel::INFO, msg, loc);
+    log(LogLevel::LevelInfo, msg, loc);
 }
 void Logger::warn(std::string_view msg, const std::source_location& loc) {
-    log(LogLevel::WARN, msg, loc);
+    log(LogLevel::LevelWarn, msg, loc);
 }
 void Logger::error(std::string_view msg, const std::source_location& loc) {
-    log(LogLevel::ERROR, msg, loc);
+    log(LogLevel::LevelError, msg, loc);
 }
 
 std::string Logger::formatMessage(LogLevel level, std::string_view message, const std::source_location& loc) const {
@@ -92,12 +92,12 @@ std::string Logger::formatMessage(LogLevel level, std::string_view message, cons
 
 std::string Logger::levelToString(LogLevel level) {
     switch (level) {
-        case LogLevel::TRACE: return "TRACE";
-        case LogLevel::DEBUG: return "DEBUG";
-        case LogLevel::INFO:  return "INFO";
-        case LogLevel::WARN:  return "WARN";
-        case LogLevel::ERROR: return "ERROR";
-        case LogLevel::OFF:   return "OFF";
+        case LogLevel::LevelTrace: return "TRACE";
+        case LogLevel::LevelDebug: return "DEBUG";
+        case LogLevel::LevelInfo:  return "INFO";
+        case LogLevel::LevelWarn:  return "WARN";
+        case LogLevel::LevelError: return "ERROR";
+        case LogLevel::LevelOff:   return "OFF";
         default:              return "UNKNOWN";
     }
 }
