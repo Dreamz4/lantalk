@@ -26,33 +26,29 @@ jobs:
           path: build-release/lantalk
 
   windows:
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        # Install mingw-w64 for cross-compilation
-        run: sudo apt-get update && sudo apt-get install -y cmake mingw-w64
-      - name: Setup OpenSSL for MinGW
-        run: |
-          # Download precompiled OpenSSL for MinGW (to avoid building it from source in CI)
-          wget https://curl.se/ca/cacert.pem
-          # For a real production app, we would cross-compile OpenSSL or use a pre-built package
-          # To keep this simple and fast, we'll download a trusted pre-built OpenSSL for MinGW.
-          wget https://github.com/curl/curl-for-win/releases/download/curl-8.9.1/curl-8.9.1-win64-mingw.zip
-          unzip curl-8.9.1-win64-mingw.zip
-          sudo cp -r curl-8.9.1-win64-mingw/include/openssl /usr/x86_64-w64-mingw32/include/
-          sudo cp curl-8.9.1-win64-mingw/lib/libcrypto.a /usr/x86_64-w64-mingw32/lib/
-          sudo cp curl-8.9.1-win64-mingw/lib/libssl.a /usr/x86_64-w64-mingw32/lib/
-      - name: Configure CMake
-        run: |
-          cmake -S . -B build-win -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-openssl
+            mingw-w64-ucrt-x86_64-ninja
       - name: Build
-        run: cmake --build build-win -j$(nproc)
+        shell: msys2 {0}
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: lantalk-windows-x86_64.exe
-          path: build-win/lantalk.exe
+          path: build/lantalk.exe
 
   release:
     needs: [linux, windows]
