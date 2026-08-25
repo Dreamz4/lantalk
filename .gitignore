@@ -1,0 +1,39 @@
+# Build output
+build/
+build-*/
+*.o
+*.a
+
+# Compiled binaries
+lantalk
+lantalk.exe
+*.AppImage
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+install_manifest.txt
+_CPack_Packages/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Config files (user-generated, not for repo)
+*.ini
+*.cfg
+
+# Logs
+*.log
+
+# Python cache (from pip-installed cmake)
+__pycache__/
+*.pyc

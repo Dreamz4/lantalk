@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libssl-dev
+      - name: Configure CMake
+        run: cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build-release -j$(nproc)
+      - name: Strip Binary
+        run: strip build-release/lantalk
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lantalk-linux-x86_64
+          path: build-release/lantalk
+
+  windows:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        # Install mingw-w64 for cross-compilation
+        run: sudo apt-get update && sudo apt-get install -y cmake mingw-w64
+      - name: Setup OpenSSL for MinGW
+        run: |
+          # Download precompiled OpenSSL for MinGW (to avoid building it from source in CI)
+          wget https://curl.se/ca/cacert.pem
+          # For a real production app, we would cross-compile OpenSSL or use a pre-built package
+          # To keep this simple and fast, we'll download a trusted pre-built OpenSSL for MinGW.
+          wget https://github.com/curl/curl-for-win/releases/download/curl-8.9.1/curl-8.9.1-win64-mingw.zip
+          unzip curl-8.9.1-win64-mingw.zip
+          sudo cp -r curl-8.9.1-win64-mingw/include/openssl /usr/x86_64-w64-mingw32/include/
+          sudo cp curl-8.9.1-win64-mingw/lib/libcrypto.a /usr/x86_64-w64-mingw32/lib/
+          sudo cp curl-8.9.1-win64-mingw/lib/libssl.a /usr/x86_64-w64-mingw32/lib/
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build-win -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build-win -j$(nproc)
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lantalk-windows-x86_64.exe
+          path: build-win/lantalk.exe
+
+  release:
+    needs: [linux, windows]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            lantalk-linux-x86_64/lantalk
+            lantalk-windows-x86_64.exe/lantalk.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
