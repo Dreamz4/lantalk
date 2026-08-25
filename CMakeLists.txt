@@ -45,6 +45,10 @@ target_link_libraries(lantalk PRIVATE
 
 if(WIN32)
     target_link_libraries(lantalk PRIVATE ws2_32 wsock32 crypt32)
+    if(MINGW)
+        # Force static linking of C++ and GCC standard libraries
+        target_link_options(lantalk PRIVATE -static -static-libgcc -static-libstdc++)
+    endif()
 endif()
 
 option(BUILD_TESTING "Build tests" OFF)
