@@ -391,7 +391,52 @@ int main(int argc, char* argv[]) {
         // For now, delegate to scan
         runScan(cfg, args);
     } else if (cmd.empty()) {
-        lantalk::CommandParser::printHelp();
+        // INTERACTIVE DESKTOP MODE
+        // Triggers when user double-clicks the .exe or runs without arguments
+        std::cout << R"(
+      __               ______      ____ __ 
+     / /  ___ ____    /_  __/__ _ / / // /__
+    / /__/ _ `/ _ \    / / / _ `// / //  '_/
+   /____/\_,_/_//_/   /_/  \_,_//_/_//_/\_\ 
+                                           
+        ( ( ( ( (  📡  ) ) ) ) )           
+                                           
+   P2P Local Area Network Messenger v1.0.5  
+=============================================
+)";
+        while (true) {
+            std::cout << "\nChoose an action:\n"
+                      << "  [1] Listen for incoming connections\n"
+                      << "  [2] Scan Wi-Fi/LAN for peers\n"
+                      << "  [3] Connect to a specific IP address\n"
+                      << "  [4] View Status / Info\n"
+                      << "  [5] Exit\n\n"
+                      << "LANTALK> ";
+                      
+            std::string choice;
+            if (!std::getline(std::cin, choice)) break;
+            
+            if (choice == "1") {
+                runListen(cfg, args);
+                // When they /quit the chat, they return to menu
+            } else if (choice == "2") {
+                runScan(cfg, args);
+            } else if (choice == "3") {
+                std::cout << "Enter IP Address (e.g. 192.168.1.5): ";
+                std::string ip;
+                if (std::getline(std::cin, ip) && !ip.empty()) {
+                    lantalk::ParsedArgs connectArgs = args;
+                    connectArgs.positional.push_back(ip);
+                    runConnect(cfg, connectArgs);
+                }
+            } else if (choice == "4") {
+                runStatus(cfg, args);
+            } else if (choice == "5" || choice == "exit" || choice == "quit") {
+                break;
+            } else if (!choice.empty()) {
+                std::cout << "Invalid choice. Enter 1-5.\n";
+            }
+        }
     } else {
         std::cerr << "Unknown command: " << cmd << "\n"
                   << "Run 'lantalk --help' for usage.\n";
