@@ -10,6 +10,9 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+if(WIN32)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
 
@@ -44,7 +47,7 @@ target_link_libraries(lantalk PRIVATE
 )
 
 if(WIN32)
-    target_link_libraries(lantalk PRIVATE ws2_32 wsock32 crypt32)
+    target_link_libraries(lantalk PRIVATE ws2_32 wsock32 crypt32 bcrypt advapi32)
     if(MINGW)
         # Force static linking of C++ and GCC standard libraries
         target_link_options(lantalk PRIVATE -static -static-libgcc -static-libstdc++)
